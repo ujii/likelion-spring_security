@@ -25,7 +25,18 @@ public class SecurityConfig {
                         .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER")
                         // 위에서 설정하지 않은 모든 요청에 대해서는 인증(authenticated)된 사용자에 한해 허용(로그인 필요)
                         .anyRequest().authenticated()
-                );
+                )
+                // form 로그인 방식을 사용할 것이다.
+                .formLogin(auth -> auth
+                        .loginPage("/login") // 로그인은 /login에서 수행한다.
+                        .loginProcessingUrl("/loginProc")
+                        .permitAll()
+                ) // 로그인 프로세싱은 해당 경로로 수행한다.
+
+                // 폼 로그인 방식을 사용하게 되면 csrf 설정이 디폴트로 동작하게 된다.
+                // csrf가 동작하면 POST 요청을 보낼 때 csrf 토큰도 함께 보내야 요청이 수행된다.
+                // 우리의 개발환경에서는 토큰을 보내주도록 설정하지 않았기 때문에 임시로 비활성화 한다.
+                .csrf(auth -> auth.disable());
 
         return http.build();
     }
