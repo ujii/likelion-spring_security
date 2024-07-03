@@ -4,11 +4,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    // 비밀번호 암호화를 위한 빈 생성
+    @Bean // 빈으로 등록시킴으로서 어디서든 사용할 수 있게된다.
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 
     // SecurityFilterChain 커스텀 빈 스프링 빈으로 등록
     @Bean
@@ -18,7 +26,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth // 람다 식으로 작성 해야함
                         // 메인페이지와 로그인 페이지로의 접근은 모두 허용(인증 필요x)
-                        .requestMatchers("/", "/login").permitAll()
+                        .requestMatchers("/", "/login","/join","joinProc").permitAll()
                         // admin 페이지로의 접근은 ADMIN 권한을 가진 경우에만 허용
                         .requestMatchers("/admin").hasRole("ADMIN")
                         // my 경로 이후의 모든 경로에 대해서 ADMIN, 혹은 USER권한 보유시 접근 가능
@@ -35,7 +43,7 @@ public class SecurityConfig {
 
                 // 폼 로그인 방식을 사용하게 되면 csrf 설정이 디폴트로 동작하게 된다.
                 // csrf가 동작하면 POST 요청을 보낼 때 csrf 토큰도 함께 보내야 요청이 수행된다.
-                // 우리의 개발환경에서는 토큰을 보내주도록 설정하지 않았기 때문에 임시로 비활성화 한다.
+                // 우리의 개발환경에서는 토큰ㅇ르 보내주도록 설정하지 않았기 때문에 임시로 비활성화 한다.
                 .csrf(auth -> auth.disable());
 
         return http.build();
